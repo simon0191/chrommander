@@ -3,7 +3,7 @@ const path = require('path')
 function fromSharedConfig(moduleName) {
   return {
     name: moduleName,
-    entry: `./src/${moduleName}/index.ts`,
+    entry: `./src/${moduleName}/index.tsx`,
     devtool: 'inline-source-map',
     module: {
       rules: [
