@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+  "name": "Chrommander",
+  "version": "0.0.1",
+  "author": "@simon0191",
+  "browser_action": {
+    "default_popup": "popup/index.html"
+  },
+  "background": {
+    "scripts": ["background/bundle.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": ["foreground/bundle.js"]
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "tabs"
+  ]
+}
