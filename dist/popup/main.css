@@ -1,0 +1,9 @@
+.Chrommander .Popup form {
+  position: fixed;
+}
+
+.Chrommander .Popup .Tab.selected {
+  border-style: solid;
+  border-width: 2px;
+  border-color: red;
+}
