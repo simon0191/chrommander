@@ -5,10 +5,11 @@ import * as classnames from 'classnames'
 interface TabProps {
   selected: boolean
   tab: chrome.tabs.Tab
+  onClick?: () => void
 }
 
 export default class Tab extends React.Component<TabProps, {}> {
-  element: HTMLLIElement
+  element: HTMLElement
 
   constructor(props: TabProps) {
     super(props)
@@ -22,7 +23,10 @@ export default class Tab extends React.Component<TabProps, {}> {
 
   render() {
     return (
-      <li ref={(el) => this.element = el } className={classnames('Tab', {selected: this.props.selected})}>
+      <li
+        ref={(el) => this.element = el}
+        onClick={this.props.onClick}
+        className={classnames('Tab', {selected: this.props.selected})}>
         <div className='img-container'>
           <img src={this.props.tab.favIconUrl} />
         </div>

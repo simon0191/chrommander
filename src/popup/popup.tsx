@@ -5,12 +5,12 @@ import Tab from './tab'
 
 interface PopupProps {
   tabs: Array<chrome.tabs.Tab>
-  autoFocus?: boolean
 }
 
 interface PopupState {
   query: string
   selectedTab?: number
+  currentTabs: Array<chrome.tabs.Tab>
 }
 
 export default class Popup extends React.Component<PopupProps, PopupState> {
@@ -19,20 +19,19 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     super(props)
     this.state = {
       query: '',
-      selectedTab: 0
+      selectedTab: 0,
+      currentTabs: props.tabs
     }
 
     this.handleSearchKeyDown = this.handleSearchKeyDown.bind(this)
     this.handleSearchChange = this.handleSearchChange.bind(this)
   }
 
-  currentTabs(): Array<chrome.tabs.Tab> {
-    if(this.state.query.trim() == '') {
-      return this.props.tabs
-    }
-    const tokens = this.state.query.trim().split(' ').map((t) => new RegExp(t, 'i'))
-    return this.props.tabs.filter((tab) => {
-      return tokens.every((t) => !!tab.title.match(t) || !!tab.url.match(t))
+  componentWillReceiveProps(nextProps: PopupProps) {
+    this.setState({
+      ...this.state,
+      selectedTab: 0,
+      currentTabs: this.currentTabs(nextProps.tabs, this.state.query)
     })
   }
 
@@ -40,17 +39,10 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     switch(e.key) {
       case 'Enter':
         e.preventDefault()
-        if(this.currentTabs().length > 0) {
-          const selectedTab = this.currentTabs()[this.state.selectedTab]
-          if(selectedTab.active) {
-            window.close();
-          } else {
-            chrome.tabs.update(selectedTab.id, {active: true})
-          }
-        }
+        this.openTab(this.state.selectedTab)
       break;
       case 'ArrowDown':
-        if(this.state.selectedTab + 1 < this.currentTabs().length ) {
+        if(this.state.selectedTab + 1 < this.state.currentTabs.length ) {
           this.setState({...this.state, selectedTab: this.state.selectedTab + 1})
         }
       break;
@@ -66,8 +58,13 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     this.setState({
       ...this.state,
       query: e.target.value,
-      selectedTab: 0
+      selectedTab: 0,
+      currentTabs: this.currentTabs(this.props.tabs, e.target.value)
     })
+  }
+
+  handleTabClick(index: number) {
+    this.openTab(index)
   }
 
   render() {
@@ -84,9 +81,37 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
           </form>
         </div>
         <ul className='tab-list'>
-          {this.currentTabs().map((tab, i) => <Tab selected={i === this.state.selectedTab} key={tab.id} tab={tab}/>)}
+          {this.state.currentTabs.map((tab, i) => {
+            return <Tab 
+                      onClick={this.handleTabClick.bind(this, i)} 
+                      selected={i === this.state.selectedTab} 
+                      key={tab.id} 
+                      tab={tab}/>
+            })}
         </ul>
       </div>
     )
+  }
+
+  private openTab(index: number) {
+    if(this.state.currentTabs.length > 0) {
+      const selectedTab = this.state.currentTabs[index]
+      if(selectedTab.active) {
+        window.close();
+      } else {
+        chrome.tabs.update(selectedTab.id, {active: true})
+      }
+    }
+  }
+
+  private currentTabs(tabs: Array<chrome.tabs.Tab>, query: string): Array<chrome.tabs.Tab> {
+    query = query.trim()
+    if(query == '') {
+      return tabs
+    }
+    const tokens = query.split(' ').map((t) => new RegExp(t, 'i'))
+    return tabs.filter((tab) => {
+      return tokens.every((t) => !!tab.title.match(t) || !!tab.url.match(t))
+    })
   }
 }

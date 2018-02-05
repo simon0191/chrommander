@@ -26,15 +26,20 @@
   padding-left: 5px;
 }
 
-.Chrommander .Popup .Tab{
+.Chrommander .Popup .Tab {
   list-style-type: none;
   word-wrap: break-word;
   padding-top: 15px;
   padding-bottom: 15px;
+  cursor: pointer;
+}
+.Chrommander .Popup .Tab:hover {
+  background-color: rgba(215, 242, 255, 0.4);
 }
 
 .Chrommander .Popup .Tab.selected {
-  background-color:  #e4e4e4;
+  background-color: #03A9F4;
+  color: white;
 }
 
 .Chrommander .Popup .Tab .img-container {
