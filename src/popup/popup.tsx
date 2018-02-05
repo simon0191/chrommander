@@ -41,7 +41,12 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
       case 'Enter':
         e.preventDefault()
         if(this.currentTabs().length > 0) {
-          chrome.tabs.update(this.currentTabs()[this.state.selectedTab].id, {active: true})
+          const selectedTab = this.currentTabs()[this.state.selectedTab]
+          if(selectedTab.active) {
+            window.close();
+          } else {
+            chrome.tabs.update(selectedTab.id, {active: true})
+          }
         }
       break;
       case 'ArrowDown':
@@ -68,15 +73,17 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
   render() {
     return (
       <div className='Popup'>
-        <form>
-          <input
-            tabIndex={1}
-            autoFocus={true}
-            onChange={this.handleSearchChange}
-            onKeyDown={this.handleSearchKeyDown}
-            type='text' placeholder='search...'/>
-        </form>
-        <ul>
+        <div className='form-wrapper'>
+          <form>
+            <input
+              tabIndex={1}
+              autoFocus={true}
+              onChange={this.handleSearchChange}
+              onKeyDown={this.handleSearchKeyDown}
+              type='text' placeholder='search...'/>
+          </form>
+        </div>
+        <ul className='tab-list'>
           {this.currentTabs().map((tab, i) => <Tab selected={i === this.state.selectedTab} key={tab.id} tab={tab}/>)}
         </ul>
       </div>

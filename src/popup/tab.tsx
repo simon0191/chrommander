@@ -16,18 +16,20 @@ export default class Tab extends React.Component<TabProps, {}> {
 
   componentDidUpdate() {
     if(this.props.selected) {
-      this.element.scrollIntoView()
+      this.element.scrollIntoView({block: 'end'})
     }
   }
 
   render() {
     return (
       <li ref={(el) => this.element = el } className={classnames('Tab', {selected: this.props.selected})}>
-        <div>
-          <img src={this.props.tab.favIconUrl} alt={this.props.tab.title} />
+        <div className='img-container'>
+          <img src={this.props.tab.favIconUrl} />
         </div>
-        <div>{ this.props.tab.title }</div>
-        <span>{ this.props.tab.url }</span>
+        <div className='info-container'>
+          <div>{ this.props.tab.title }</div>
+          <span>{ this.props.tab.url }</span>
+        </div>
       </li>
     )
   }

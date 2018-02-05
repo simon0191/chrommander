@@ -1,9 +1,62 @@
-.Chrommander .Popup form {
+.Chrommander {
+  width: 550px;
+}
+
+.Chrommander .Popup .form-wrapper {
+  width: 100%;
+  height: 20px;
+}
+
+.Chrommander .Popup .form-wrapper form {
   position: fixed;
+  top:0;
+  left:0;
+  right:0;
+}
+
+.Chrommander .Popup .form-wrapper form input {
+  width: 100%;
+  height: 30px;
+  font-size: 15px;
+  padding: 2px 15px;
+}
+
+.Chrommander .Popup .tab-list {
+  padding-top: 20px;
+  padding-left: 5px;
+}
+
+.Chrommander .Popup .Tab{
+  list-style-type: none;
+  word-wrap: break-word;
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
 
 .Chrommander .Popup .Tab.selected {
-  border-style: solid;
-  border-width: 2px;
-  border-color: red;
+  background-color:  #e4e4e4;
+}
+
+.Chrommander .Popup .Tab .img-container {
+  float: left;
+  padding: 5px;
+  background-color: #e4e4e4;
+  width: 20px;
+  height: 20px;
+}
+
+.Chrommander .Popup .Tab .img-container img {
+  max-width: 20px;
+  max-height: 20px;
+}
+
+.Chrommander .Popup .Tab .info-container {
+  display: inline-block;
+  padding-left: 5px;
+  word-break: break-all;
+  max-width: 500px
+}
+
+.Chrommander .Popup .Tab .info-container div {
+  word-break: break-all;
 }
