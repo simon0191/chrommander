@@ -71,7 +71,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         <form>
           <input
             tabIndex={1}
-            autoFocus={this.props.autoFocus}
+            autoFocus={true}
             onChange={this.handleSearchChange}
             onKeyDown={this.handleSearchKeyDown}
             type='text' placeholder='search...'/>

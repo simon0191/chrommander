@@ -30,7 +30,9 @@ class MainContainer extends React.Component<{}, AppState> {
 }
 
 console.log('Hello Chrommander - popup')
-render(
-  <MainContainer/>,
-  document.getElementById('root')
-)
+setTimeout(() => {
+  render(
+    <MainContainer/>,
+    document.getElementById('root')
+  )
+}, 100)
