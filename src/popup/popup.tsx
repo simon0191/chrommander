@@ -2,15 +2,19 @@ import * as React from 'react';
 import {KeyboardEvent, ChangeEvent} from 'react';
 import * as classnames from 'classnames'
 import Tab from './tab'
+import Bookmark from './bookmark'
 
 interface PopupProps {
   tabs: Array<chrome.tabs.Tab>
+  bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>
+  queryHandler: (query: string) => void
 }
 
 interface PopupState {
   query: string
   selectedTab?: number
   currentTabs: Array<chrome.tabs.Tab>
+  currentBookmarks: Array<chrome.bookmarks.BookmarkTreeNode>
 }
 
 export default class Popup extends React.Component<PopupProps, PopupState> {
@@ -20,7 +24,8 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     this.state = {
       query: '',
       selectedTab: 0,
-      currentTabs: props.tabs
+      currentTabs: props.tabs,
+      currentBookmarks: props.bookmarks,
     }
 
     this.handleSearchKeyDown = this.handleSearchKeyDown.bind(this)
@@ -31,7 +36,8 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     this.setState({
       ...this.state,
       selectedTab: 0,
-      currentTabs: this.currentTabs(nextProps.tabs, this.state.query)
+      currentTabs: nextProps.tabs,
+      currentBookmarks: nextProps.bookmarks,
     })
   }
 
@@ -55,12 +61,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
   }
 
   handleSearchChange(e: ChangeEvent<HTMLInputElement>) {
-    this.setState({
-      ...this.state,
-      query: e.target.value,
-      selectedTab: 0,
-      currentTabs: this.currentTabs(this.props.tabs, e.target.value)
-    })
+    this.props.queryHandler(e.target.value)
   }
 
   handleTabClick(index: number) {
@@ -87,6 +88,13 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
                       selected={i === this.state.selectedTab} 
                       key={tab.id} 
                       tab={tab}/>
+            })}
+            {this.state.currentBookmarks.map((bookmark, i) => {
+            return <Bookmark
+                      onClick={this.handleTabClick.bind(this, i)} 
+                      selected={i === this.state.selectedTab} 
+                      key={bookmark.id} 
+                      bookmark={bookmark}/>
             })}
         </ul>
       </div>

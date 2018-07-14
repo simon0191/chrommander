@@ -19,7 +19,8 @@
   ],
   "permissions": [
     "activeTab",
-    "tabs"
+    "tabs",
+    "bookmarks"
   ],
   "commands": {
     "_execute_browser_action": {
