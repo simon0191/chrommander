@@ -68,6 +68,10 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     this.openTab(index)
   }
 
+  handleBookmarkClick(index: number) {
+    this.createTab(this.state.currentBookmarks[index].url)
+  }
+
   render() {
     return (
       <div className='Popup'>
@@ -91,7 +95,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
             })}
             {this.state.currentBookmarks.map((bookmark, i) => {
             return <Bookmark
-                      onClick={this.handleTabClick.bind(this, i)} 
+                      onClick={this.handleBookmarkClick.bind(this, i)} 
                       selected={i === this.state.selectedTab} 
                       key={bookmark.id} 
                       bookmark={bookmark}/>
@@ -110,6 +114,10 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         chrome.tabs.update(selectedTab.id, {active: true})
       }
     }
+  }
+
+  private createTab(url: string) {
+    chrome.tabs.create({url, active: true})
   }
 
   private currentTabs(tabs: Array<chrome.tabs.Tab>, query: string): Array<chrome.tabs.Tab> {
