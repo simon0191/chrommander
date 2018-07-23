@@ -9,23 +9,22 @@ export interface ItemProps {
     title: string
     url: string
     itemType: ItemType
+    wasClicked: boolean
 }
-  
-export interface ItemState {}
 
-export default class Item extends React.Component<ItemProps, ItemState> {
+export default class Item extends React.Component<ItemProps, {}> {
 
     element: HTMLElement
 
-    static buildFromTab(item: chrome.tabs.Tab, isSelected: boolean): JSX.Element {
-        return this.build(item, ItemType.Tab, isSelected);
+    static buildFromTab(item: chrome.tabs.Tab, isSelected: boolean, wasClicked: boolean): JSX.Element {
+        return this.build(item, ItemType.Tab, isSelected, wasClicked);
     }
 
-    static buildFromBookmark(item: chrome.bookmarks.BookmarkTreeNode, isSelected: boolean) {
-        return this.build(item, ItemType.Bookmark, isSelected);
+    static buildFromBookmark(item: chrome.bookmarks.BookmarkTreeNode, isSelected: boolean, wasClicked: boolean): JSX.Element {
+        return this.build(item, ItemType.Bookmark, isSelected, wasClicked);
     }
 
-    private static build(item: chrome.bookmarks.BookmarkTreeNode | chrome.tabs.Tab, itemType: ItemType, isSelected: boolean): JSX.Element {
+    private static build(item: chrome.bookmarks.BookmarkTreeNode | chrome.tabs.Tab, itemType: ItemType, isSelected: boolean, wasClicked: boolean): JSX.Element {
         return (
             <Item
                 id={item.id}
@@ -34,6 +33,7 @@ export default class Item extends React.Component<ItemProps, ItemState> {
                 title={item.title}
                 url={item.url}
                 itemType={itemType}
+                wasClicked={wasClicked}
             />
         )
     }
@@ -56,6 +56,9 @@ export default class Item extends React.Component<ItemProps, ItemState> {
     componentDidUpdate() {
         if(this.props.selected) {
             this.element.scrollIntoView({block: 'end'})
+        }
+        if (this.props.wasClicked) {
+            this.onClick()
         }
     }
     

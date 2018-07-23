@@ -1,8 +1,6 @@
 import * as React from 'react';
 import {KeyboardEvent, ChangeEvent} from 'react';
 import * as classnames from 'classnames'
-import Tab from './tab'
-import Bookmark from './bookmark'
 import Item from './components/Item/index';
 
 interface PopupProps {
@@ -14,6 +12,7 @@ interface PopupProps {
 interface PopupState {
   query: string
   selectedTab?: number
+  clickedItem?: number
   currentTabs: Array<chrome.tabs.Tab>
   currentBookmarks: Array<chrome.bookmarks.BookmarkTreeNode>
 }
@@ -45,8 +44,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
   handleSearchKeyDown(e: KeyboardEvent<{}>) {
     switch(e.key) {
       case 'Enter':
-        e.preventDefault()
-        this.openTab(this.state.selectedTab)
+        this.setState({...this.state, clickedItem: this.state.selectedTab})
       break;
       case 'ArrowDown':
         if(this.state.selectedTab + 1 < this.state.currentTabs.length ) {
@@ -80,35 +78,14 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         </div>
         <ul className='tab-list'>
           {this.state.currentTabs.map((tab, i) => {
-            return Item.buildFromTab(tab, this.state.selectedTab === i);
+            return Item.buildFromTab(tab, this.state.selectedTab === i, this.state.clickedItem == i);
           })}
           {this.state.currentBookmarks.map((bookmark, i) => {
-            return Item.buildFromBookmark(bookmark, this.state.selectedTab === i);
+            return Item.buildFromBookmark(bookmark, this.state.selectedTab === i, this.state.clickedItem == i);
           })}
         </ul>
       </div>
     )
   }
-
-  private openTab(index: number) {
-    if(this.state.currentTabs.length > 0) {
-      const selectedTab = this.state.currentTabs[index]
-      if(selectedTab.active) {
-        window.close();
-      } else {
-        chrome.tabs.update(selectedTab.id, {active: true})
-      }
-    }
-  }
-
-  private currentTabs(tabs: Array<chrome.tabs.Tab>, query: string): Array<chrome.tabs.Tab> {
-    query = query.trim()
-    if(query == '') {
-      return tabs
-    }
-    const tokens = query.split(' ').map((t) => new RegExp(t, 'i'))
-    return tabs.filter((tab) => {
-      return tokens.every((t) => !!tab.title.match(t) || !!tab.url.match(t))
-    })
-  }
+  
 }
