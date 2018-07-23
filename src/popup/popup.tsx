@@ -11,7 +11,7 @@ interface PopupProps {
 
 interface PopupState {
   query: string
-  selectedTab?: number
+  selectedItem?: number
   clickedItem?: number
   currentTabs: Array<chrome.tabs.Tab>
   currentBookmarks: Array<chrome.bookmarks.BookmarkTreeNode>
@@ -23,7 +23,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     super(props)
     this.state = {
       query: '',
-      selectedTab: 0,
+      selectedItem: 0,
       currentTabs: props.tabs,
       currentBookmarks: props.bookmarks,
     }
@@ -35,7 +35,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
   componentWillReceiveProps(nextProps: PopupProps) {
     this.setState({
       ...this.state,
-      selectedTab: 0,
+      selectedItem: 0,
       currentTabs: nextProps.tabs,
       currentBookmarks: nextProps.bookmarks,
     })
@@ -44,16 +44,17 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
   handleSearchKeyDown(e: KeyboardEvent<{}>) {
     switch(e.key) {
       case 'Enter':
-        this.setState({...this.state, clickedItem: this.state.selectedTab})
+        this.setState({...this.state, clickedItem: this.state.selectedItem})
       break;
       case 'ArrowDown':
-        if(this.state.selectedTab + 1 < this.state.currentTabs.length ) {
-          this.setState({...this.state, selectedTab: this.state.selectedTab + 1})
+        let length = Math.max(this.state.currentTabs.length, this.state.currentBookmarks.length)
+        if(this.state.selectedItem + 1 <  length) {
+          this.setState({...this.state, selectedItem: this.state.selectedItem + 1})
         }
       break;
       case 'ArrowUp':
-        if(this.state.selectedTab - 1 >= 0) {
-          this.setState({...this.state, selectedTab: this.state.selectedTab - 1})
+        if(this.state.selectedItem - 1 >= 0) {
+          this.setState({...this.state, selectedItem: this.state.selectedItem - 1})
         }
       break;
     }
@@ -78,14 +79,14 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         </div>
         <ul className='tab-list'>
           {this.state.currentTabs.map((tab, i) => {
-            return Item.buildFromTab(tab, this.state.selectedTab === i, this.state.clickedItem == i);
+            return Item.buildFromTab(tab, this.state.selectedItem === i, this.state.clickedItem == i);
           })}
           {this.state.currentBookmarks.map((bookmark, i) => {
-            return Item.buildFromBookmark(bookmark, this.state.selectedTab === i, this.state.clickedItem == i);
+            return Item.buildFromBookmark(bookmark, this.state.selectedItem === i, this.state.clickedItem == i);
           })}
         </ul>
       </div>
     )
   }
-  
+
 }
