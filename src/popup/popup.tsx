@@ -3,6 +3,7 @@ import {KeyboardEvent, ChangeEvent} from 'react';
 import * as classnames from 'classnames'
 import Tab from './tab'
 import Bookmark from './bookmark'
+import Item from './components/Item/index';
 
 interface PopupProps {
   tabs: Array<chrome.tabs.Tab>
@@ -64,14 +65,6 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     this.props.queryHandler(e.target.value)
   }
 
-  handleTabClick(index: number) {
-    this.openTab(index)
-  }
-
-  handleBookmarkClick(index: number) {
-    this.createTab(this.state.currentBookmarks[index].url)
-  }
-
   render() {
     return (
       <div className='Popup'>
@@ -87,19 +80,11 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         </div>
         <ul className='tab-list'>
           {this.state.currentTabs.map((tab, i) => {
-            return <Tab 
-                      onClick={this.handleTabClick.bind(this, i)} 
-                      selected={i === this.state.selectedTab} 
-                      key={tab.id} 
-                      tab={tab}/>
-            })}
-            {this.state.currentBookmarks.map((bookmark, i) => {
-            return <Bookmark
-                      onClick={this.handleBookmarkClick.bind(this, i)} 
-                      selected={i === this.state.selectedTab} 
-                      key={bookmark.id} 
-                      bookmark={bookmark}/>
-            })}
+            return Item.buildFromTab(tab, this.state.selectedTab === i);
+          })}
+          {this.state.currentBookmarks.map((bookmark, i) => {
+            return Item.buildFromBookmark(bookmark, this.state.selectedTab === i);
+          })}
         </ul>
       </div>
     )
@@ -114,10 +99,6 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         chrome.tabs.update(selectedTab.id, {active: true})
       }
     }
-  }
-
-  private createTab(url: string) {
-    chrome.tabs.create({url, active: true})
   }
 
   private currentTabs(tabs: Array<chrome.tabs.Tab>, query: string): Array<chrome.tabs.Tab> {
