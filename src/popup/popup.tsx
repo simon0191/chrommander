@@ -1,16 +1,20 @@
 import * as React from 'react';
 import {KeyboardEvent, ChangeEvent} from 'react';
 import * as classnames from 'classnames'
-import Tab from './tab'
+import Item from './components/Item/index';
 
 interface PopupProps {
   tabs: Array<chrome.tabs.Tab>
+  bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>
+  queryHandler: (query: string) => void
 }
 
 interface PopupState {
   query: string
-  selectedTab?: number
+  selectedItem?: number
+  clickedItem?: number
   currentTabs: Array<chrome.tabs.Tab>
+  currentBookmarks: Array<chrome.bookmarks.BookmarkTreeNode>
 }
 
 export default class Popup extends React.Component<PopupProps, PopupState> {
@@ -19,8 +23,9 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     super(props)
     this.state = {
       query: '',
-      selectedTab: 0,
-      currentTabs: props.tabs
+      selectedItem: 0,
+      currentTabs: props.tabs,
+      currentBookmarks: props.bookmarks,
     }
 
     this.handleSearchKeyDown = this.handleSearchKeyDown.bind(this)
@@ -30,41 +35,33 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
   componentWillReceiveProps(nextProps: PopupProps) {
     this.setState({
       ...this.state,
-      selectedTab: 0,
-      currentTabs: this.currentTabs(nextProps.tabs, this.state.query)
+      selectedItem: 0,
+      currentTabs: nextProps.tabs,
+      currentBookmarks: nextProps.bookmarks,
     })
   }
 
   handleSearchKeyDown(e: KeyboardEvent<{}>) {
     switch(e.key) {
       case 'Enter':
-        e.preventDefault()
-        this.openTab(this.state.selectedTab)
+        this.setState({...this.state, clickedItem: this.state.selectedItem})
       break;
       case 'ArrowDown':
-        if(this.state.selectedTab + 1 < this.state.currentTabs.length ) {
-          this.setState({...this.state, selectedTab: this.state.selectedTab + 1})
+        let length = Math.max(this.state.currentTabs.length, this.state.currentBookmarks.length)
+        if(this.state.selectedItem + 1 <  length) {
+          this.setState({...this.state, selectedItem: this.state.selectedItem + 1})
         }
       break;
       case 'ArrowUp':
-        if(this.state.selectedTab - 1 >= 0) {
-          this.setState({...this.state, selectedTab: this.state.selectedTab - 1})
+        if(this.state.selectedItem - 1 >= 0) {
+          this.setState({...this.state, selectedItem: this.state.selectedItem - 1})
         }
       break;
     }
   }
 
   handleSearchChange(e: ChangeEvent<HTMLInputElement>) {
-    this.setState({
-      ...this.state,
-      query: e.target.value,
-      selectedTab: 0,
-      currentTabs: this.currentTabs(this.props.tabs, e.target.value)
-    })
-  }
-
-  handleTabClick(index: number) {
-    this.openTab(index)
+    this.props.queryHandler(e.target.value)
   }
 
   render() {
@@ -82,36 +79,14 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         </div>
         <ul className='tab-list'>
           {this.state.currentTabs.map((tab, i) => {
-            return <Tab 
-                      onClick={this.handleTabClick.bind(this, i)} 
-                      selected={i === this.state.selectedTab} 
-                      key={tab.id} 
-                      tab={tab}/>
-            })}
+            return Item.buildFromTab(tab, this.state.selectedItem === i, this.state.clickedItem == i);
+          })}
+          {this.state.currentBookmarks.map((bookmark, i) => {
+            return Item.buildFromBookmark(bookmark, this.state.selectedItem === i, this.state.clickedItem == i);
+          })}
         </ul>
       </div>
     )
   }
 
-  private openTab(index: number) {
-    if(this.state.currentTabs.length > 0) {
-      const selectedTab = this.state.currentTabs[index]
-      if(selectedTab.active) {
-        window.close();
-      } else {
-        chrome.tabs.update(selectedTab.id, {active: true})
-      }
-    }
-  }
-
-  private currentTabs(tabs: Array<chrome.tabs.Tab>, query: string): Array<chrome.tabs.Tab> {
-    query = query.trim()
-    if(query == '') {
-      return tabs
-    }
-    const tokens = query.split(' ').map((t) => new RegExp(t, 'i'))
-    return tabs.filter((tab) => {
-      return tokens.every((t) => !!tab.title.match(t) || !!tab.url.match(t))
-    })
-  }
 }
