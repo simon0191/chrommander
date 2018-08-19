@@ -1,15 +1,15 @@
 # Chrommander
 
-Chrome extension to make your life easier. Press Cmd+Shift+P and:
+Chrome extension to make your life easier. Press `Cmd+Shift+P` and:
 
   - Navigate to opened tabs
+  - Search and open bookmarks by typing `b<space><your query>`. i.e. `b facebook`
 
 Comming soon:
-  - Search and open bookmarks
   - Search and open pages in your history
 
 
-## Run
+## Develop
 
   1. install node 9
   1. npm install
