@@ -20,7 +20,8 @@
   "permissions": [
     "activeTab",
     "tabs",
-    "bookmarks"
+    "bookmarks",
+    "chrome://favicon/"
   ],
   "commands": {
     "_execute_browser_action": {
